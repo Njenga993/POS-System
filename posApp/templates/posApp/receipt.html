@@ -1,0 +1,121 @@
+{% load humanize %}
+<style>
+    #uni_modal .modal-footer {
+        display: none;
+    }
+    
+    @media print {
+        .no-print { display: none; }
+    }
+</style>
+<div class="container-fluid">
+    <div id="outprint">
+        <div class="lh-1 text-center">
+            <small class="fw-bold">Nyakazi Organics LTD</small><br>
+            <small class="fw-bold">P.O 264 - 20116 </small><br>
+            <small class="fw-bold">Location : GILGIL</small><br>
+            <small class="fw-bold">nyakaziorganics@gmail.com</small><br>
+            <small class="fw-bold">Phone: 0792 940 014</small><br><br>
+            <small class="fw-bold">POS INVOICE</small><br><br>
+            <small class="fw-bold"><B>M-PESA PAYBILL NO:</B></small><br>
+            <small class="fw-bold"> 400200 </small><br><br>
+            <small class="fw-bold"><B>ACCOUNT NO:</B></small><br>
+            <small class="fw-bold"> 26673 </small>
+        </div>
+        <hr>
+        <div class="lh-1">
+            <div>
+                <span>Date:</span> {{ transaction.date_added|date:"M d Y" }} <br>
+                <span>Transaction Code:</span> {{ transaction.code }}
+                <p><strong>Served By:</strong> {{ user.first_name }}</p>
+            </div>
+        </div>
+        <div class="clear-fix py-3"></div>
+        <div class="lh-1">
+            <div class="d-flex w-100 align-items-end border-bottom fw-bold">
+                <div class="col-2 text-center">Qty</div>
+                <div class="col-6 text-center">Product</div>
+                <div class="col-4 text-center">Amount</div>
+            </div>
+            {% for item in salesItems %}
+            <div class="d-flex w-100 align-items-end">
+                <div class="col-2 text-center">{{ item.qty|intcomma|floatformat:0 }}</div>
+                <div class="col-6">
+                    <div class="lh-1">
+                        <small>{{ item.product_id }}</small><br>
+                        <small>{{ item.price|intcomma }}</small>
+                    </div>
+                </div>
+                <div class="col-4 text-end">{{ item.total|intcomma }}</div>
+            </div>
+            {% endfor %}
+            <hr>
+            <div class="d-flex w-100 align-items-end">
+                <div class="col-6 text-start fw-bold">Total</div>
+                <div class="col-6 text-end fw-bold">{{ transaction.grand_total|intcomma }}</div>
+            </div>
+            <div class="d-flex w-100 align-items-end">
+                <div class="col-6 text-start fw-bold">Tax <small>(inclusive)</small>: {{ transaction.tax|intcomma }}%</div>
+                <div class="col-6 text-end">{{ transaction.tax_amount|intcomma|floatformat:2 }}</div>
+            </div>
+            <div class="d-flex w-100 align-items-end">
+                <div class="col-6 text-start fw-bold">Tendered</div>
+                <div class="col-6 text-end">{{ transaction.tendered_amount|intcomma }}</div>
+            </div>
+            <div class="d-flex w-100 align-items-end">
+                <div class="col-6 text-start fw-bold">Change</div>
+                <div class="col-6 text-end">{{ transaction.amount_change|intcomma }}</div>
+            </div>
+        </div>
+        <hr>
+        <br>
+        <br>
+        <div class="container-fluid">
+            <div id="outprint">
+                <div class="lh-1 text-center">
+                    <small class="fw-bold">THANK YOU For Shopping With Us.</small><br>
+                </div>
+    </div>
+   
+    <div class="clear-fix py-3">
+        <div class="d-flex w-100 justify-content-end">
+            <button class="btn btn-light bg-gradient border rounded-0 btn-sm me-1 no-print" type="button" id="receipt_print"><i class="mdi mdi-printer"></i> Print</button>
+            <button class="btn btn-secondary bg-gradient border rounded-0 btn-sm no-print" type="button" data-bs-dismiss="modal"><i class="mdi mdi-close"></i> Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+   $(function() {
+    $('#receipt_print').click(function() {
+        var printWindow = window.open('', '_blank', "width=800,height=800,left=300,top=200");
+        var content = document.getElementById('outprint').innerHTML;
+        var headContent = document.head.innerHTML;
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                ${headContent}
+                <title>Receipt - Print View</title>
+                <style>
+                    body { font-family: Arial, sans-serif; background-color: white; }
+                    @media print {
+                        .no-print { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                ${content}
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 300);
+    });
+});
+
+</script>

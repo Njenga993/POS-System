@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if page_title %}{{ page_title }} | Nyakazi Organics POS{% else %}Nyakazi Organics POS{% endif %}</title>
+    <link rel="icon" href="static/posAPP/assets/material-admin/images/logo_processed.jpg" type="image/png">
+    <link rel="stylesheet" href="{% static 'posApp/assets/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'posApp/assets/material-admin/vendors/mdi/css/materialdesignicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'posApp/assets/material-admin/vendors/css/vendor.bundle.base.css' %}">
+    <link rel="stylesheet" href="{% static 'posApp/assets/material-admin/css/demo/style.css' %}">
+    <script src="{% static 'posApp/assets/default/js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'posApp/assets/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        .login-container input {
+            background: rgba(255, 255, 255, 0.5);
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .login-container button {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div>
+            <a href="{% url 'home-page' %}">
+                <img src="static/posAPP/assets/material-admin/images/logo_processed.jpg" alt="Company Logo" class="mb-3" style="max-width: 100px;">
+            </a>
+            <h3>Nyakazi Organics POS</h3>
+        </div>
+        <form id="login-form" method="POST" action="{% url 'login-user' %}">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <script>
+        $(function() {
+            $('#login-form').submit(function(e) {
+                e.preventDefault();
+                let form = $(this);
+                $('.err-msg').remove();
+                let errorMsg = $('<div class="alert alert-danger err-msg" style="display: none;"></div>');
+                if (!this.checkValidity()) {
+                    this.reportValidity();
+                    return;
+                }
+                $.ajax({
+                    headers: { "X-CSRFToken": '{{ csrf_token }}' },
+                    url: form.attr('action'),
+                    data: form.serialize(),
+                    method: 'POST',
+                    dataType: 'json',
+                    success: function(resp) {
+                        if (resp.status === 'success') {
+                            window.location.href = "{% url 'home-page' %}";
+                        } else {
+                            errorMsg.text(resp.msg || "Invalid login credentials");
+                            form.prepend(errorMsg);
+                            errorMsg.show();
+                        }
+                    },
+                    error: function() {
+                        errorMsg.text("An error occurred. Please try again.");
+                        form.prepend(errorMsg);
+                        errorMsg.show();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

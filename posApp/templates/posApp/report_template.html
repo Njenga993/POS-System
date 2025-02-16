@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ report_title }}</title>
+    
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        /* Header */
+        .header {
+            background-color: #2C3E50;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+        }
+        .header img {
+            max-width: 120px;
+        }
+        .header .contact-info {
+            text-align: right;
+        }
+        .header .contact-info p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* Report Container */
+        .report-container {
+            width: 90%;
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background: #2C3E50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        /* Export Buttons */
+        .export-buttons {
+            margin-top: 20px;
+        }
+        .export-buttons button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .export-buttons button:hover {
+            background: #2980b9;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 30px;
+            background-color: #2C3E50;
+            color: white;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        /* Hide Buttons When Printing */
+        @media print {
+            .export-buttons {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <!-- Logo on the Left -->
+        <img src="static/posAPP/assets/material-admin/images/logo_processed.jpg" alt="Company Logo">
+        
+        <!-- Contact Info on the Right -->
+        <div class="contact-info">
+            <p>📞 +254 792 940 014 | ✉ nyakaziorganics@gmail.com</p>
+        </div>
+    </div>
+
+    <!-- Report Container -->
+    <div class="report-container">
+        <h2>{{ report_title }}</h2>
+        <table>
+            <tr>
+                {% for header in headers %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in data %}
+                <tr>
+                    {% for item in row %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+
+        <!-- Export Buttons (Hidden When Printing) -->
+        <div class="export-buttons">
+            <button onclick="printReport()">🖨️ Print</button>
+            
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2025 Nyakazi Organics. All Rights Reserved.</p>
+    </div>
+
+    <!-- JavaScript Functions -->
+    <script>
+        function printReport() {
+            window.print();  // Opens the print dialog
+        }
+
+        function downloadPDF() {
+            let reportType = "{{ report_title|lower }}".replace(" ", "_");  // Get report type
+            window.location.href = `/report/download/${reportType}/`;  // Redirect to download URL
+        }
+    </script>
+
+</body>
+</html>
