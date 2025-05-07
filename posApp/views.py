@@ -439,7 +439,7 @@ def process_sale(request):
 
         for item in request.session.get('cart', []):
             product = get_object_or_404(Products, id=item['product_id'])
-            inventory = Inventory.objects.get(product=product)
+            inventory, created = Inventory.objects.get_or_create(product=product, defaults={'stock': 0})
             qty = item['qty']
             price = product.price
             total = qty * price
@@ -453,9 +453,11 @@ def process_sale(request):
                     price=price,
                     total=total
                 )
+                inventory.stock -= qty
+                inventory.save()
                 total_amount += total
             else:
-                return HttpResponse(f"Error: Not enough stock for {product.name}")
+                return HttpResponse(f"Error: Not enough stock for {product.name}. Available: {inventory.stock}")
 
         # Update sale totals
         sale.grand_total = total_amount

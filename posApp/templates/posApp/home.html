@@ -1,4 +1,49 @@
-{% extends "posApp/base.html" %} {% load humanize %} {% block pageContent %}
+{% extends "posApp/base.html" %}
+{% load humanize %}
+{% block pageContent %}
+<style>
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2C3E50;
+    }
+    .info-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+    .card-inner {
+        padding: 20px;
+    }
+    .card-inner h5 {
+        margin-bottom: 0.5rem;
+    }
+    .font-weight-light {
+        font-size: 1.5rem;
+        color: #34495E;
+    }
+    .tx-12 {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+    }
+    .card-icon-wrapper {
+        font-size: 2rem;
+        margin-top: 10px;
+        color: #ffffff80;
+        background: rgba(255, 255, 255, 0.1);
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+</style>
+
 <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
     <div class="mdc-card">
         <div class="d-flex justify-content-between">
@@ -6,9 +51,12 @@
         </div>
     </div>
 </div>
+
 <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
     <hr class="w-100">
 </div>
+
+<!-- Categories -->
 <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet">
     <div class="mdc-card info-card info-card--success">
         <div class="card-inner">
@@ -21,6 +69,8 @@
         </div>
     </div>
 </div>
+
+<!-- Products -->
 <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet">
     <div class="mdc-card info-card info-card--primary">
         <div class="card-inner">
@@ -33,6 +83,8 @@
         </div>
     </div>
 </div>
+
+<!-- Today's Transactions -->
 <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet">
     <div class="mdc-card info-card info-card--info">
         <div class="card-inner">
@@ -45,6 +97,8 @@
         </div>
     </div>
 </div>
+
+<!-- Today's Sales -->
 <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet">
     <div class="mdc-card info-card info-card--warning">
         <div class="card-inner">

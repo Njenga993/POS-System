@@ -83,22 +83,12 @@ class Sales(models.Model):
         return self.code
 
 class salesItems(models.Model):
-    sale_id = models.ForeignKey(Sales, on_delete=models.CASCADE)
-    product_id = models.ForeignKey(Products, on_delete=models.CASCADE)
+    sale_id = models.ForeignKey(Sales,on_delete=models.CASCADE)
+    product_id = models.ForeignKey(Products,on_delete=models.CASCADE)
     price = models.FloatField(default=0)
     qty = models.FloatField(default=0)
     total = models.FloatField(default=0)
 
-    def save(self, *args, **kwargs):
-        """Reduce stock when a sale item is saved."""
-        inventory = Inventory.objects.get(product=self.product_id)
-
-        if inventory.stock >= self.qty:
-            inventory.stock -= self.qty  # Reduce stock
-            inventory.save()  # Save updated stock
-            super().save(*args, **kwargs)  # Save the salesItem
-        else:
-            raise ValueError(f"Not enough stock for {self.product_id.name}. Available: {inventory.stock}, Requested: {self.qty}")
 
     
 class Inventory(models.Model):
