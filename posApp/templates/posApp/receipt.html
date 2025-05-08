@@ -3,119 +3,145 @@
     #uni_modal .modal-footer {
         display: none;
     }
-    
+
     @media print {
-        .no-print { display: none; }
+        .no-print { display: none !important; }
+    }
+
+    .receipt-header, .receipt-footer {
+        text-align: center;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .receipt-header small,
+    .receipt-footer small {
+        display: block;
+        font-weight: bold;
+    }
+
+    .receipt-body {
+        font-size: 13px;
+    }
+
+    .receipt-body .row {
+        margin-bottom: 0.3rem;
+    }
+
+    .receipt-body .fw-bold {
+        font-weight: bold;
     }
 </style>
-<div class="container-fluid">
+
+<div class="container-fluid receipt-body">
     <div id="outprint">
-        <div class="lh-1 text-center">
-            <small class="fw-bold">Nyakazi Organics LTD</small><br>
-            <small class="fw-bold">P.O 264 - 20116 </small><br>
-            <small class="fw-bold">Location : GILGIL</small><br>
-            <small class="fw-bold">nyakaziorganics@gmail.com</small><br>
-            <small class="fw-bold">Phone: 0792 940 014</small><br><br>
-            <small class="fw-bold">POS INVOICE</small><br><br>
-            <small class="fw-bold"><B>M-PESA PAYBILL NO:</B></small><br>
-            <small class="fw-bold"> 400200 </small><br><br>
-            <small class="fw-bold"><B>ACCOUNT NO:</B></small><br>
-            <small class="fw-bold"> 26673 </small>
+        <div class="receipt-header">
+            <small>Nyakazi Organics LTD</small>
+            <small>P.O 264 - 20116</small>
+            <small>Location: GILGIL</small>
+            <small>nyakaziorganics@gmail.com</small>
+            <small>Phone: 0792 940 014</small><br>
+            <small>POS INVOICE</small><br>
+            <small><b>M-PESA PAYBILL NO:</b> 400200</small>
+            <small><b>ACCOUNT NO:</b> 26673</small>
         </div>
+
         <hr>
-        <div class="lh-1">
-            <div>
-                <span>Date:</span> {{ transaction.date_added|date:"M d Y" }} <br>
-                <span>Transaction Code:</span> {{ transaction.code }}
-                <p><strong>Served By:</strong> {{ user.first_name }}</p>
-            </div>
+
+        <div class="mb-2">
+            <div>Date: <strong>{{ transaction.date_added|date:"M d, Y" }}</strong></div>
+            <div>Transaction Code: <strong>{{ transaction.code }}</strong></div>
+            <div>Served By: <strong>{{ user.first_name }}</strong></div>
         </div>
-        <div class="clear-fix py-3"></div>
-        <div class="lh-1">
-            <div class="d-flex w-100 align-items-end border-bottom fw-bold">
-                <div class="col-2 text-center">Qty</div>
-                <div class="col-6 text-center">Product</div>
-                <div class="col-4 text-center">Amount</div>
-            </div>
-            {% for item in salesItems %}
-            <div class="d-flex w-100 align-items-end">
-                <div class="col-2 text-center">{{ item.qty|intcomma|floatformat:0 }}</div>
-                <div class="col-6">
-                    <div class="lh-1">
-                        <small>{{ item.product_id }}</small><br>
-                        <small>{{ item.price|intcomma }}</small>
-                    </div>
-                </div>
-                <div class="col-4 text-end">{{ item.total|intcomma }}</div>
-            </div>
-            {% endfor %}
-            <hr>
-            <div class="d-flex w-100 align-items-end">
-                <div class="col-6 text-start fw-bold">Total</div>
-                <div class="col-6 text-end fw-bold">{{ transaction.grand_total|intcomma }}</div>
-            </div>
-            <div class="d-flex w-100 align-items-end">
-                <div class="col-6 text-start fw-bold">Tax <small>(inclusive)</small>: {{ transaction.tax|intcomma }}%</div>
-                <div class="col-6 text-end">{{ transaction.tax_amount|intcomma|floatformat:2 }}</div>
-            </div>
-            <div class="d-flex w-100 align-items-end">
-                <div class="col-6 text-start fw-bold">Tendered</div>
-                <div class="col-6 text-end">{{ transaction.tendered_amount|intcomma }}</div>
-            </div>
-            <div class="d-flex w-100 align-items-end">
-                <div class="col-6 text-start fw-bold">Change</div>
-                <div class="col-6 text-end">{{ transaction.amount_change|intcomma }}</div>
-            </div>
+
+        <div class="d-flex fw-bold border-bottom py-1">
+            <div class="col-2 text-center">Qty</div>
+            <div class="col-6 text-center">Product</div>
+            <div class="col-4 text-end">Amount</div>
         </div>
+
+        {% for item in salesItems %}
+        <div class="d-flex">
+            <div class="col-2 text-center">{{ item.qty|intcomma|floatformat:0 }}</div>
+            <div class="col-6">
+                <small>{{ item.product_id }}</small><br>
+                <small>Ksh {{ item.price|intcomma }}</small>
+            </div>
+            <div class="col-4 text-end">Ksh {{ item.total|intcomma }}</div>
+        </div>
+        {% endfor %}
+
         <hr>
-        <br>
-        <br>
-        <div class="container-fluid">
-            <div id="outprint">
-                <div class="lh-1 text-center">
-                    <small class="fw-bold">THANK YOU For Shopping With Us.</small><br>
-                </div>
+
+        <div class="d-flex fw-bold">
+            <div class="col-6">Total</div>
+            <div class="col-6 text-end">Ksh {{ transaction.grand_total|intcomma }}</div>
+        </div>
+        <div class="d-flex">
+            <div class="col-6">Tax ({{ transaction.tax }}%)</div>
+            <div class="col-6 text-end">Ksh {{ transaction.tax_amount|floatformat:2|intcomma }}</div>
+        </div>
+        <div class="d-flex">
+            <div class="col-6">Tendered</div>
+            <div class="col-6 text-end">Ksh {{ transaction.tendered_amount|intcomma }}</div>
+        </div>
+        <div class="d-flex">
+            <div class="col-6">Change</div>
+            <div class="col-6 text-end">Ksh {{ transaction.amount_change|intcomma }}</div>
+        </div>
+
+        <hr><br>
+
+        <div class="receipt-footer">
+            <small>THANK YOU for Shopping With Us</small>
+        </div>
     </div>
-   
-    <div class="clear-fix py-3">
-        <div class="d-flex w-100 justify-content-end">
-            <button class="btn btn-light bg-gradient border rounded-0 btn-sm me-1 no-print" type="button" id="receipt_print"><i class="mdi mdi-printer"></i> Print</button>
-            <button class="btn btn-secondary bg-gradient border rounded-0 btn-sm no-print" type="button" data-bs-dismiss="modal"><i class="mdi mdi-close"></i> Close</button>
-        </div>
+
+    <div class="d-flex justify-content-end mt-3 no-print">
+        <button class="btn btn-light border btn-sm me-2" id="receipt_print">
+            <i class="mdi mdi-printer"></i> Print
+        </button>
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+            <i class="mdi mdi-close"></i> Close
+        </button>
     </div>
 </div>
 
 <script>
-   $(function() {
-    $('#receipt_print').click(function() {
-        var printWindow = window.open('', '_blank', "width=800,height=800,left=300,top=200");
-        var content = document.getElementById('outprint').innerHTML;
-        var headContent = document.head.innerHTML;
+    $(function () {
+        $('#receipt_print').click(function () {
+            const content = document.getElementById('outprint').innerHTML;
+            const headContent = document.head.innerHTML;
+            const printWindow = window.open('', '_blank', 'width=800,height=800,left=300,top=200');
 
-        printWindow.document.write(`
-            <html>
-            <head>
-                ${headContent}
-                <title>Receipt - Print View</title>
-                <style>
-                    body { font-family: Arial, sans-serif; background-color: white; }
-                    @media print {
-                        .no-print { display: none; }
-                    }
-                </style>
-            </head>
-            <body>
-                ${content}
-            </body>
-            </html>
-        `);
-        printWindow.document.close();
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        ${headContent}
+                        <title>Receipt - Print View</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; background: white; padding: 20px; }
+                            .no-print { display: none; }
+                            .col-2, .col-4, .col-6 { display: inline-block; }
+                            .col-2 { width: 20%; }
+                            .col-4 { width: 40%; }
+                            .col-6 { width: 60%; }
+                            .text-center { text-align: center; }
+                            .text-end { text-align: right; }
+                        </style>
+                    </head>
+                    <body>
+                        ${content}
+                    </body>
+                </html>
+            `);
 
-        setTimeout(() => {
-            printWindow.print();
-            printWindow.close();
-        }, 300);
+            printWindow.document.close();
+
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 300);
+        });
     });
-});
-
 </script>

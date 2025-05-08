@@ -1,103 +1,101 @@
 <div class="container-fluid">
     <form action="" id="product-form">
-        <input type="hidden" name="id" value="{% if product.pk %}{{product.pk}}{% endif %}">
+        <input type="hidden" name="id" value="{{ product.pk|default:'' }}">
+
         <div class="form-group mb-3">
             <label for="code" class="control-label">Code</label>
-            <input type="text" name="code" id="code" class="form-control form-control-sm rounded-0" value="{% if product.code %}{{product.code}}{% endif %}" required>
+            <input type="text" name="code" id="code" class="form-control form-control-sm rounded-0" 
+                   value="{{ product.code|default:'' }}" required>
         </div>
+
         <div class="form-group mb-3">
             <label for="category_id" class="control-label">Category</label>
             <select name="category_id" id="category_id" class="form-select form-select-sm rounded-0" required>
-            {% if not product.category_id %}
-            <option value="" disabled selected></option>
-            {% else %}
-            <option value="" disabled></option>
-            {% endif %}
-            {% for category in categories %}
-                {% if product.category_id == category.id %}
-                <option value="{{ category.id }}" selected>{{ category.name }}</option>
-                {% else %}
-                <option value="{{ category.id }}">{{ category.name }}</option>
-                {% endif %}
-            {% endfor %}
-        </select>
-            <div class="form-group mb-3">
-                <label for="name" class="control-label">Product Name</label>
-                <input type="text" name="name" id="name" class="form-control form-control-sm rounded-0" value="{% if product.name %}{{product.name}}{% endif %}" required>
-            </div>
-            <div class="form-group mb-3">
-                <label for="description" class="control-label">Description</label>
-                <textarea rows="5" name="description" id="description" class="form-control form-control-sm rounded-0" required>{% if product.description %}{{product.description}}{% endif %}</textarea>
-            </div>
-            <div class="form-group mb-3">
-                <label for="price" class="control-label">Price</label>
-                <input type="text" name="price" id="price" class="form-control form-control-sm rounded-0" value="{% if product.price %}{{product.price}}{% endif %}" required>
-            </div>
-            <div class="form-group mb-3">
-                <label for="status" class="control-label">Status</label>
-                <select name="status" id="status" class="form-select form-select-sm rounded-0" required>
-            {% if product.status and product.status == 1 %}
-            <option value="1" selected>Active</option>
-            {% else %}
-            <option value="1">Active</option>
-            {% endif %}
+                <option value="" disabled {% if not product.category_id %}selected{% endif %}>-- Select Category --</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if product.category_id == category.id %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
 
-            {% if product.status and product.status == 0 %}
-            <option value="0" selected>Inactive</option>
-            {% else %}
-            <option value="0">Inactive</option>
-            {% endif %}
-        </select>
-            </div>
+        <div class="form-group mb-3">
+            <label for="name" class="control-label">Product Name</label>
+            <input type="text" name="name" id="name" class="form-control form-control-sm rounded-0" 
+                   value="{{ product.name|default:'' }}" required>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="description" class="control-label">Description</label>
+            <textarea rows="5" name="description" id="description" 
+                      class="form-control form-control-sm rounded-0" required>{{ product.description|default:'' }}</textarea>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="price" class="control-label">Price</label>
+            <input type="number" step="0.01" name="price" id="price" class="form-control form-control-sm rounded-0" 
+                   value="{{ product.price|default:'' }}" required>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="status" class="control-label">Status</label>
+            <select name="status" id="status" class="form-select form-select-sm rounded-0" required>
+                <option value="1" {% if product.status == 1 %}selected{% endif %}>Active</option>
+                <option value="0" {% if product.status == 0 %}selected{% endif %}>Inactive</option>
+            </select>
+        </div>
     </form>
-    </div>
-    <script>
-        $(function() {
-            $('#product-form').submit(function(e) {
-                e.preventDefault();
-                var _this = $(this)
-                $('.err-msg').remove();
-                var el = $('<div>')
-                el.addClass("alert alert-danger err-msg")
-                el.hide()
-                if (_this[0].checkValidity() == false) {
-                    _this[0].reportValidity();
-                    return false;
-                }
-                start_loader();
-                $.ajax({
-                    headers: {
-                        "X-CSRFToken": '{{csrf_token}}'
-                    },
-                    url: "{% url 'save-product-page' %}",
-                    data: new FormData($(this)[0]),
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    method: 'POST',
-                    type: 'POST',
-                    dataType: 'json',
-                    error: err => {
-                        console.log(err)
-                        end_loader();
-                    },
-                    success: function(resp) {
-                        if (typeof resp == 'object' && resp.status == 'success') {
-                            el.removeClass("alert alert-danger err-msg")
-                            location.reload()
-                        } else if (resp.status == 'failed' && !!resp.msg) {
-                            el.text(resp.msg)
-                        } else {
-                            el.text("An error occured", 'error');
-                            end_loader();
-                            console.err(resp)
-                        }
-                        _this.prepend(el)
-                        el.show('slow')
+</div>
+
+<script>
+    $(function () {
+        $('#product-form').on('submit', function (e) {
+            e.preventDefault();
+
+            const $form = $(this);
+            $('.err-msg').remove();
+
+            // Frontend validation
+            if (!$form[0].checkValidity()) {
+                $form[0].reportValidity();
+                return;
+            }
+
+            const errorAlert = $('<div class="alert alert-danger err-msg" style="display:none;"></div>');
+            $form.prepend(errorAlert);
+
+            start_loader();
+
+            $.ajax({
+                url: "{% url 'save-product-page' %}",
+                method: 'POST',
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                cache: false,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                dataType: 'json',
+                success: function (resp) {
+                    if (resp.status === 'success') {
+                        location.reload();  // or you can redirect
+                    } else {
+                        const msg = resp.msg || "An unknown error occurred.";
+                        errorAlert.text(msg).slideDown();
                         $("html, body, .modal").scrollTop(0);
-                        end_loader()
                     }
-                })
-            })
-        })
-    </script>
+                },
+                error: function (xhr, status, error) {
+                    console.error("AJAX Error:", error);
+                    errorAlert.text("A server error occurred. Please try again.").slideDown();
+                    $("html, body, .modal").scrollTop(0);
+                },
+                complete: function () {
+                    end_loader();
+                }
+            });
+        });
+    });
+</script>

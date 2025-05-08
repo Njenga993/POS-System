@@ -1,80 +1,81 @@
-<div class="container-fluid">
+<div class="container-fluid py-3">
     <form action="" id="category-form">
-        <input type="hidden" name="id" value="{% if category.pk %}{{category.pk}}{% endif %}">
-        <div class="form-group mb-3">
-            <label for="name" class="control-label">Category Name</label>
-            <input type="text" name="name" id="name" class="form-control form-control-sm rounded-0" value="{% if category.name %}{{category.name}}{% endif %}" required>
-        </div>
-        <div class="form-group mb-3">
-            <label for="description" class="control-label">Description</label>
-            <textarea rows="5" name="description" id="description" class="form-control form-control-sm rounded-0" required>{% if category.description %}{{category.description}}{% endif %}</textarea>
-        </div>
-        <div class="form-group mb-3">
-            <label for="status" class="control-label">Status</label>
-            <select name="status" id="status" class="form-select form-select-sm rounded-0" required>
-            {% if category.status == 1 %}
-            <option value="1" selected>Active</option>
-            {% else %}
-            <option value="1">Active</option>
-            {% endif %}
+        <input type="hidden" name="id" value="{{ category.pk|default:'' }}">
 
-            {% if category.status == 0 %}
-            <option value="0" selected>Inactive</option>
-            {% else %}
-            <option value="0">Inactive</option>
-            {% endif %}
-        </select>
+        <!-- Category Name -->
+        <div class="mb-3">
+            <label for="name" class="form-label">Category Name</label>
+            <input type="text" name="name" id="name" class="form-control form-control-sm rounded-2" 
+                   value="{{ category.name|default:'' }}" required>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea rows="4" name="description" id="description" 
+                      class="form-control form-control-sm rounded-2" required>{{ category.description|default:'' }}</textarea>
+        </div>
+
+        <!-- Status -->
+        <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select name="status" id="status" class="form-select form-select-sm rounded-2" required>
+                <option value="1" {% if category.status == 1 %}selected{% endif %}>Active</option>
+                <option value="0" {% if category.status == 0 %}selected{% endif %}>Inactive</option>
+            </select>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="form-error" class="alert alert-danger d-none"></div>
+
+        <!-- Submit Button (optional) -->
+        <div class="text-end">
+            <button type="submit" class="btn btn-sm btn-primary rounded-2">Save Category</button>
         </div>
     </form>
 </div>
+
 <script>
-    $(function() {
-        $('#category-form').submit(function(e) {
+    $(function () {
+        $('#category-form').submit(function (e) {
             e.preventDefault();
-            var _this = $(this)
-            $('.err-msg').remove();
-            var el = $('<div>')
-            el.addClass("alert alert-danger err-msg")
-            el.hide()
-            if (_this[0].checkValidity() == false) {
-                _this[0].reportValidity();
-                return false;
+            const $form = $(this);
+            const $errorBox = $('#form-error');
+            $errorBox.addClass('d-none').text('');
+
+            if (!this.checkValidity()) {
+                this.reportValidity();
+                return;
             }
+
             start_loader();
+
             $.ajax({
-                headers: {
-                    "X-CSRFToken": '{{csrf_token}}'
-                },
                 url: "{% url 'save-category-page' %}",
-                data: new FormData($(this)[0]),
-                cache: false,
+                method: 'POST',
+                headers: {
+                    "X-CSRFToken": '{{ csrf_token }}'
+                },
+                data: new FormData(this),
                 contentType: false,
                 processData: false,
-                method: 'POST',
-                type: 'POST',
                 dataType: 'json',
-                error: err => {
-                    console.log(err)
-                    alert_toast("An error occured", 'error');
+                success: function (resp) {
+                    if (resp.status === 'success') {
+                        location.reload();
+                    } else {
+                        const errorMsg = resp.msg || "An unexpected error occurred.";
+                        $errorBox.removeClass('d-none').text(errorMsg);
+                        $("html, body, .modal").scrollTop(0);
+                    }
                     end_loader();
                 },
-                success: function(resp) {
-                    if (typeof resp == 'object' && resp.status == 'success') {
-                        el.removeClass("alert alert-danger err-msg")
-                        location.reload()
-                    } else if (resp.status == 'failed' && !!resp.msg) {
-                        el.text(resp.msg)
-                    } else {
-                        el.text("An error occured", 'error');
-                        end_loader();
-                        console.err(resp)
-                    }
-                    _this.prepend(el)
-                    el.show('slow')
-                    $("html, body, .modal").scrollTop(0);
-                    end_loader()
+                error: function (xhr, status, error) {
+                    console.error(error);
+                    $errorBox.removeClass('d-none').text("Network or server error.");
+                    end_loader();
                 }
-            })
-        })
-    })
+            });
+        });
+    });
 </script>

@@ -1,61 +1,114 @@
 {% load static %}
-<!-- partial:partials/_sidebar.html -->
-<aside class="mdc-drawer mdc-drawer--dismissible mdc-drawer--open bg-dark bg-gradient">
-    <div class="mdc-drawer__header border-bottom border-light">
-        <a href="{% url 'home-page' %}" class="brand-logo">
-            <img src="static/posAPP/assets/material-admin/images/logo_processed.jpg" 
-     alt="Company Logo" 
-     class="mb-3 d-block mx-auto" 
-     style="max-width: 130px;">
-            <h3 class="text-center text-light">Nyakazi Organics POS</h3>
+<!-- Sidebar Styles & Toggle Script -->
+<style>
+    .sidebar {
+        background-color: #121212;
+        color: #f1f1f1;
+        width: 250px;
+        transition: transform 0.3s ease;
+        position: fixed;
+    }
+
+    .sidebar-collapsed {
+        transform: translateX(-100%);
+    }
+
+    .sidebar .logo img {
+        max-width: 100px;
+        border-radius: 10px;
+    }
+
+    .sidebar .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 10px 20px;
+        color: #f1f1f1;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .sidebar .nav-link:hover {
+        background-color: #1f1f1f;
+        border-left: 4px solid #00c853;
+    }
+
+    .sidebar .material-icons-sharp {
+        margin-right: 15px;
+    }
+
+    .hamburger {
+        display: none;
+        font-size: 28px;
+        cursor: pointer;
+        padding: 10px;
+        background: none;
+        border: none;
+        color: #fff;
+    }
+
+    @media (max-width: 768px) {
+        .hamburger {
+            display: block;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+    }
+</style>
+
+<!-- Hamburger Button -->
+<button class="hamburger" onclick="toggleSidebar()">
+    <i class="material-icons-sharp">menu</i>
+</button>
+
+<!-- Sidebar -->
+<aside id="sidebar" class="sidebar mdc-drawer mdc-drawer--dismissible mdc-drawer--open">
+    <div class="mdc-drawer__header text-center py-3 border-bottom border-secondary">
+        <a href="{% url 'home-page' %}" class="logo d-block">
+            <img src="{% static 'posAPP/assets/material-admin/images/logo_processed.jpg' %}" alt="Logo" class="mb-2 mx-auto">
+            <h4 class="text-light font-weight-bold mt-2">Nyakazi POS</h4>
         </a>
     </div>
-    <div class="mdc-drawer__content">
-        <div class="mdc-list-group">
-            <nav class="mdc-list mdc-drawer-menu">
-                <div class="mdc-list-item mdc-drawer-item">
-                    <a class="mdc-drawer-link" href="{% url 'home-page' %}">
-                        <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">home</i> Home
-                    </a>
-                </div>
-                <div class="mdc-list-item mdc-drawer-item">
-                    <a class="mdc-drawer-link" href="{% url 'inventory-list' %}">
-                        <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">list</i> Inventory
-                    </a>
-                </div>
-                <div class="mdc-list-item mdc-drawer-item">
-                    <a class="mdc-drawer-link" href="{% url 'category-page' %}">
-                        <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">list</i> Category List
-                    </a>
-                </div>
-                <div class="mdc-list-item mdc-drawer-item">
-                    <a class="mdc-drawer-link" href="{% url 'product-page' %}">
-                        <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">label</i> Product List
-                    </a>
-                </div>
-                <div class="mdc-list-item mdc-drawer-item">
-                    <a class="mdc-drawer-link" href="{% url 'generate-report' 'products' %}">
-                        <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">books</i> products Report
-                    </a>
-                </div>
-                <div class="mdc-list-item mdc-drawer-item">
-                    <a class="mdc-drawer-link" href="{% url 'pos-page' %}">
-                        <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">payment</i> POS
-                    </a>
-                </div>
-                <div class="mdc-list-item mdc-drawer-item">
-                    <a class="mdc-drawer-link" href="{% url 'sales-page' %}">
-                        <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">receipt</i> Sales
-                    </a>
-                </div>
-               <div class="mdc-list-item mdc-drawer-item">
-                <a class="mdc-drawer-link" href="{% url 'generate-report' 'sales' %}">
-                    <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">books</i> Sales Report
-                </a>
-            </div>
-           
-            </nav>
-        </div>
+    <div class="mdc-drawer__content pt-3">
+        <nav class="mdc-list mdc-drawer-menu">
+            <a class="nav-link" href="{% url 'home-page' %}">
+                <i class="material-icons-sharp">dashboard_customize</i> Home
+            </a>
+            <a class="nav-link" href="{% url 'inventory-list' %}">
+                <i class="material-icons-sharp">inventory</i> Inventory
+            </a>
+            <a class="nav-link" href="{% url 'category-page' %}">
+                <i class="material-icons-sharp">category</i> Categories
+            </a>
+            <a class="nav-link" href="{% url 'product-page' %}">
+                <i class="material-icons-sharp">shopping_cart</i> Products
+            </a>
+            <a class="nav-link" href="{% url 'generate-report' 'products' %}">
+                <i class="material-icons-sharp">summarize</i> Product Report
+            </a>
+            <a class="nav-link" href="{% url 'pos-page' %}">
+                <i class="material-icons-sharp">point_of_sale</i> POS
+            </a>
+            <a class="nav-link" href="{% url 'sales-page' %}">
+                <i class="material-icons-sharp">receipt</i> Sales
+            </a>
+            <a class="nav-link" href="{% url 'generate-report' 'sales' %}">
+                <i class="material-icons-sharp">bar_chart</i> Sales Report
+            </a>
+        </nav>
     </div>
 </aside>
-<!-- partial -->
+
+<!-- Toggle Script -->
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('sidebar-collapsed');
+    }
+</script>
+
+<!-- Material Icons Sharp -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Icons+Sharp" rel="stylesheet">

@@ -1,4 +1,7 @@
-{% extends "posApp/base.html" %} {% load humanize %} {% block pageContent %}
+{% extends "posApp/base.html" %} 
+{% load humanize %} 
+
+{% block pageContent %}
 <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
     <div class="mdc-card py-2">
         <div class="d-flex justify-content-between align-items-center">
@@ -20,13 +23,13 @@
                 </colgroup>
                 <thead>
                     <tr>
-                        <th class="text-center py-1">#</th>
-                        <th class="text-center py-1">DateTime</th>
-                        <th class="text-center py-1">Trans. Code</th>
-                        <th class="text-center py-1">Total</th>
-                        <th class="text-center py-1">Tax Inclusive</th>
-                        <th class="text-center py-1">Items</th>
-                        <th class="text-center py-1">Action</th>
+                        <th scope="col" class="text-center py-1">#</th>
+                        <th scope="col" class="text-center py-1">DateTime</th>
+                        <th scope="col" class="text-center py-1">Trans. Code</th>
+                        <th scope="col" class="text-center py-1">Total</th>
+                        <th scope="col" class="text-center py-1">Tax Inclusive</th>
+                        <th scope="col" class="text-center py-1">Items</th>
+                        <th scope="col" class="text-center py-1">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,7 +46,7 @@
                                 <i class="material-icons mdc-button__icon">receipt</i>
                             </button>
                             <button class="mdc-button mdc-button--raised p-1 icon-button filled-button--danger mdc-ripple-upgraded delete-data" type="button" data-id="{{ sale.id }}" data-code="{{ sale.code }}" title="Delete">
-                                <i class="material-icons mdc-button__icon">deleteoutline</i>
+                                <i class="material-icons mdc-button__icon">delete_outline</i>
                             </button>
                         </td>
                     </tr>
@@ -53,16 +56,19 @@
         </div>
     </div>
 </div>
-{% endblock pageContent %} {% block ScriptBlock %}
+{% endblock pageContent %}
+
+{% block ScriptBlock %}
 <script>
     $(function() {
         $('.view-data').click(function() {
             uni_modal("Transaction's Receipt", "{% url 'receipt-modal' %}?id=" + $(this).attr('data-id'))
         })
-        $('.delete-data').click(function() {
-            _conf("Are you sure to delete <b>" + $(this).attr('data-code') + "</b> Transaction record?", "delete_sale", [$(this).attr('data-id')])
-        })
 
+        $('.delete-data').click(function() {
+            const saleCode = $(this).attr('data-code');
+            _conf(`Are you sure you want to delete the transaction with code <b>${saleCode}</b>? This action cannot be undone.`, "delete_sale", [$(this).attr('data-id')])
+        })
     })
 
     function delete_sale($id) {
@@ -73,22 +79,21 @@
             },
             url: "{% url 'delete-sale' %}",
             method: "POST",
-            data: {
-                id: $id
-            },
+            data: { id: $id },
             dataType: "json",
-            error: err => {
-                console.log(err)
-                alert_toast("An error occured.", 'error');
-                end_loader();
-            },
             success: function(resp) {
-                if (typeof resp == 'object' && resp.status == 'success') {
+                if (resp.status == 'success') {
+                    alert_toast("Transaction deleted successfully.", 'success');
                     location.reload();
                 } else {
-                    alert_toast("An error occured.", 'error');
-                    end_loader();
+                    alert_toast("An error occurred while deleting the transaction. Please try again.", 'error');
                 }
+                end_loader();
+            },
+            error: function(err) {
+                console.log(err);
+                alert_toast("An error occurred. Please try again later.", 'error');
+                end_loader();
             }
         })
     }

@@ -1,123 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ report_title }}</title>
 
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --primary-color: #2C3E50;
+            --secondary-color: #3498db;
+            --accent-color: #ecf0f1;
+            --text-color: #333;
+        }
+
         /* General Styling */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            text-align: center;
+            background-color: var(--accent-color);
+            color: var(--text-color);
         }
 
         /* Header */
         .header {
-            background-color: #2C3E50;
+            background-color: var(--primary-color);
             color: white;
-            padding: 15px 30px;
+            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            text-align: left;
             flex-wrap: wrap;
         }
+
         .header img {
-            max-width: 120px;
+            height: 60px;
         }
-        .header .contact-info {
-            text-align: right;
-        }
-        .header .contact-info p {
-            margin: 0;
-            font-size: 14px;
+
+        .contact-info p {
+            margin: 2px 0;
+            font-size: 15px;
         }
 
         /* Report Container */
         .report-container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 20px auto;
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
         }
 
-        /* Scrollable Table */
+        .report-container h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* Table Styling */
         .table-wrapper {
             overflow-x: auto;
-            width: 100%;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
-            min-width: 600px; /* Ensures table has base width for scroll */
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-            white-space: nowrap; /* Prevent content from wrapping */
-        }
-        th {
-            background: #2C3E50;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background: #f9f9f9;
+            margin-top: 20px;
+            min-width: 700px;
         }
 
-        /* Export Buttons */
-        .export-buttons {
-            margin-top: 20px;
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            white-space: nowrap;
         }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f7f7f7;
+        }
+
+        tr:hover {
+            background-color: #eef6fb;
+        }
+
+        /* Buttons */
+        .export-buttons {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
         .export-buttons button {
-            background: #3498db;
+            background-color: var(--secondary-color);
             color: white;
             border: none;
-            padding: 10px 15px;
-            margin: 5px;
-            cursor: pointer;
+            padding: 10px 18px;
             border-radius: 5px;
+            cursor: pointer;
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
         }
+
         .export-buttons button:hover {
-            background: #2980b9;
+            background-color: #2471a3;
+        }
+
+        .export-buttons i {
+            font-style: normal;
         }
 
         /* Footer */
         .footer {
-            margin-top: 30px;
-            background-color: #2C3E50;
+            background-color: var(--primary-color);
             color: white;
-            padding: 10px;
+            text-align: center;
+            padding: 15px;
             font-size: 14px;
+            margin-top: 40px;
         }
 
-        /* Hide Buttons When Printing */
+        /* Print Mode */
         @media print {
-            .export-buttons {
+            .export-buttons,
+            .header,
+            .footer {
                 display: none;
-            }
-
-            .table-wrapper {
-                overflow: visible;
-            }
-
-            body {
-                background-color: white;
             }
 
             .report-container {
                 box-shadow: none;
                 border: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                background: white;
             }
         }
     </style>
@@ -126,20 +162,17 @@
 
     <!-- Header -->
     <div class="header">
-        <!-- Logo on the Left -->
-        <img src="static/posAPP/assets/material-admin/images/logo_processed.jpg" alt="Company Logo">
-        
-        <!-- Contact Info on the Right -->
+        <img src="{% static 'posApp/assets/material-admin/images/logo_processed.jpg' %}" alt="Company Logo">
         <div class="contact-info">
-            <p>📞 +254 792 940 014 | ✉ nyakaziorganics@gmail.com</p>
+            <p>📞 +254 792 940 014</p>
+            <p>✉ nyakaziorganics@gmail.com</p>
         </div>
     </div>
 
-    <!-- Report Container -->
+    <!-- Report Section -->
     <div class="report-container">
         <h2>{{ report_title }}</h2>
 
-        <!-- Scrollable Table -->
         <div class="table-wrapper">
             <table>
                 <tr>
@@ -157,9 +190,9 @@
             </table>
         </div>
 
-        <!-- Export Buttons (Hidden When Printing) -->
         <div class="export-buttons">
-            <button onclick="printReport()">🖨️ Print</button>
+            <button onclick="printReport()"><i>🖨</i> Print</button>
+            <button onclick="downloadPDF()"><i>⬇️</i> Export PDF</button>
         </div>
     </div>
 
@@ -168,14 +201,14 @@
         <p>&copy; 2025 Nyakazi Organics. All Rights Reserved.</p>
     </div>
 
-    <!-- JavaScript Functions -->
+    <!-- JavaScript -->
     <script>
         function printReport() {
-            window.print();  // Opens the print dialog
+            window.print();
         }
 
         function downloadPDF() {
-            let reportType = "{{ report_title|lower }}".replace(" ", "_");
+            let reportType = "{{ report_title|lower|slugify }}";
             window.location.href = `/report/download/${reportType}/`;
         }
     </script>
